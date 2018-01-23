@@ -2,7 +2,7 @@ import requests
 import re
 import GetJpg
 OutputDir = '.\output'
-url = 'http://www.7160.com/special/rentiyishu.html'
+url = 'http://www.68gxdy.com'
 
 DirPath = OutputDir
 
