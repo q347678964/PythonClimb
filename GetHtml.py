@@ -5,7 +5,7 @@ import shutil
 import os
 OutputPicture = 1
 OutputDir = '.\output'
-CatChWeb = 'http://www.shuaige5.com'
+CatChWeb = 'http://www.27270.com/tag/1133.html'
 #打开URL
 r = requests.get(CatChWeb)
 html = r.content
@@ -61,9 +61,9 @@ for url in link_list:
         urlhtml_fp.write(url)
         urlhtml_fp.write("\n")
         DirPath = OutputDir + '%d'%(HtmlCounter)
-        HtmlCounter = HtmlCounter + 1
         if OutputPicture == 1:
-            GetJpg.CatchJPG(url,DirPath)
+            if GetJpg.CatchJPG(url,DirPath) != -1:
+                HtmlCounter = HtmlCounter + 1
         
     m =re.match(r"https://.+?\.html$|https://.+?\.htm$" ,url)
     if m:
@@ -71,31 +71,32 @@ for url in link_list:
         urlhtml_fp.write(url)
         urlhtml_fp.write("\n")
         DirPath = OutputDir + '%d'%(HtmlCounter)
-        HtmlCounter = HtmlCounter + 1
         if OutputPicture == 1:
-            GetJpg.CatchJPG(url,DirPath)
+            if GetJpg.CatchJPG(url,DirPath) != -1:
+                HtmlCounter = HtmlCounter + 1
         
     m =re.match(r"http://.+?\.com/$|http://.+?\.com$" ,url)
     if m:
         if url[len(url)-1] == '/':
             url = url[0:len(url)-1]
         print (url) 
-        urlcom_fp.write(url)
-        urlcom_fp.write("\n")
+        urlhtml_fp.write(url)
+        urlhtml_fp.write("\n")
         DirPath = OutputDir + '%d'%(HtmlCounter)
-        HtmlCounter = HtmlCounter + 1
         if OutputPicture == 1:
-            GetJpg.CatchJPG(url,DirPath)
+            if GetJpg.CatchJPG(url,DirPath) != -1:
+                HtmlCounter = HtmlCounter + 1
         
     m =re.match(r"https://.+?\.com/$|https://.+?\.com$" ,url)
     if m:
         print (url) 
-        urlcom_fp.write(url)
-        urlcom_fp.write("\n")
+        urlhtml_fp.write(url)
+        urlhtml_fp.write("\n")
         DirPath = OutputDir + '%d'%(HtmlCounter)
-        HtmlCounter = HtmlCounter + 1
         if OutputPicture == 1:
-            GetJpg.CatchJPG(url,DirPath)
+            if GetJpg.CatchJPG(url,DirPath) != -1:
+                HtmlCounter = HtmlCounter + 1
+                
         
 '''
     m =re.match(r"http://.+?\.com$" ,url)
@@ -107,3 +108,4 @@ for url in link_list:
 urlall_fp.close()
 urlhtml_fp.close()
 urlcom_fp.close()
+print('Climb Over')

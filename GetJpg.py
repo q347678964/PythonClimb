@@ -6,19 +6,24 @@ import time
 import urlopen
   
 def dowloadPic(imageUrl,filePath):
-    r = requests.get(imageUrl)
-    with open(filePath, "wb") as code:
-        code.write(r.content)
-
-def CatchJPG(UrlParameter,SaveDirPath):
-#删除文件夹，创建文件夹
-    if os.path.exists(SaveDirPath) == True:
-        shutil.rmtree(SaveDirPath)
-    os.mkdir(SaveDirPath)
+    r = urlopen.tryopen(imageUrl)
+    if r != -1:
+        with open(filePath, "wb") as code:
+            code.write(r.content)
+        return 0
+    else:
+        return -1
     
+def CatchJPG(UrlParameter,SaveDirPath):
+
     Python_URL = UrlParameter
     r = urlopen.tryopen(Python_URL)
     if r != -1:
+        #能够打开网页，删除文件夹，创建文件夹
+        if os.path.exists(SaveDirPath) == True:
+            shutil.rmtree(SaveDirPath)
+        os.mkdir(SaveDirPath)
+        #获取内容
         html = r.content
 
 
@@ -72,13 +77,55 @@ def CatchJPG(UrlParameter,SaveDirPath):
                 
             urljpg_fp.write(url)
             urljpg_fp.write("\n")
-            jpgcounter = jpgcounter + 1
             filename = SaveDirPath + '\%d.jpg'%(jpgcounter)
-            dowloadPic(url,filename)
+            
+            if dowloadPic(url,filename)!=-1:
+               jpgcounter=jpgcounter+1
             #请求一个图片之后，等待10ms,防止服务器反爬虫行为
             time.sleep(0.1)
-            #未找到任何图片，删除创建的目录
-        if(jpgcounter == 0):
-            shutil.rmtree(SaveDirPath)
+
+        ####################################################################################和上面的相同，找PNG
+
+        link_list = re.findall(r"(?<=src=\").+?\.png(?=\")|(?<=: \").+?\.png(?=\")" ,html_doc)
+
+        #for 循环是利用相同的缩进来作为一个整体{}
+        for url in link_list:
+            if url[0] == '/' and url[1] != '/':#当以/开始时，表示在当前网页的路径下找
+                url = Python_URL + url
+            elif url[0] == '/' and url[1] == '/':#当以//开头时，表示是一个新的网站地址
+                urlhead = 'http://'
+                url = url[2:len(url)]
+                url = urlhead + url
+            else:
+                url = url
+            #再度筛选，去除带有<alt><title>的路径
+            npos = url.find('<')
+            if npos >= 0:
+                continue;
+            #再度筛选，规避src="" src="***.jpg"的语法
+            npos = url.find('\"')
+            if npos >= 0:
+                continue;
                 
+                          
+            print (url)
+                
+            urljpg_fp.write(url)
+            urljpg_fp.write("\n")
+            filename = SaveDirPath + '\%d.png'%(jpgcounter)
+            
+            if dowloadPic(url,filename)!=-1:
+               jpgcounter=jpgcounter+1
+            #请求一个图片之后，等待10ms,防止服务器反爬虫行为
+            time.sleep(0.1)
+            
+   
         urljpg_fp.close()
+        #未找到任何图片，删除创建的目录  
+        if jpgcounter == 0:
+            shutil.rmtree(SaveDirPath)
+            return -1
+        else:
+            return 0
+    else:
+        return -1

@@ -15,7 +15,7 @@ def tryopen(UrlParameter):
             r.raise_for_status()
         except:
             data = {
-                'url':url,
+                'url':UrlParameter,
                 'error_type':'requests.status.error'
             }
             print(data)
