@@ -3,12 +3,26 @@ import re
 import GetJpg
 import shutil
 import os
+import mysqlop
+import time
+import urlopen
+import sys
+
 OutputPicture = 1
 OutputDir = '.\output'
-CatChWeb = 'http://www.27270.com/tag/1133.html'
+CatChWeb = 'http://www.163.com'
 #打开URL
-r = requests.get(CatChWeb)
-html = r.content
+rep = urlopen.tryopen(CatChWeb)
+if rep == -1:
+    print('request failed.sys.exit()')
+    sys.exit()
+print(type(rep))
+print(rep.status_code)
+print(type(rep.text))
+print(rep.cookies)
+
+
+html = rep.content
 #html_doc=str(html,'utf-8')
 html_doc=html.decode("utf-8","ignore")
 #print (html_doc) 
@@ -28,6 +42,16 @@ print (npos)
 print (html_doc.find("jpeg"))
 
 '''
+#打开数据库
+pDataBase = mysqlop.open('testdb')
+mysqlop.test(pDataBase)
+mysqlop.createtable(pDataBase,'urllist')
+#获取当前系统时间
+Curtime = time.time()
+CurtimeString = time.strftime('%H:%M:%S',time.localtime(Curtime))
+CurtimeString = 'Python Start at:' + CurtimeString
+print (CurtimeString)
+
 # 利用正则查找所有链接
 # $表示字符串末尾，^表示开头
 # *匹配前一个字符0或者无限次 >=0
@@ -43,7 +67,8 @@ print (html_doc.find("jpeg"))
 urlall_fp = open("GetHtml_url_all.txt","w",encoding='utf-8')
 urlhtml_fp = open("GetHtml_url_html.txt","w",encoding='utf-8')
 urlcom_fp = open("GetHtml_url_com.txt","w",encoding='utf-8')
-HtmlCounter = 0
+HtmlTotalCounter = 0
+HtmlValidCounter = 0
 link_list =re.findall(r"(?<=href=\").+?(?=\")|(?<=href=\').+?(?=\')" ,html_doc)
 #for 循环是利用相同的缩进来作为一个整体{}
 for url in link_list:
@@ -54,49 +79,65 @@ for url in link_list:
    
     urlall_fp.write(url)
     urlall_fp.write("\r\n")
-    #找到*.html
+    #找http://*.html|htm
     m =re.match(r"http://.+?\.html$|http://.+?\.htm$" ,url)
     if m:
-        print (url) 
-        urlhtml_fp.write(url)
-        urlhtml_fp.write("\n")
-        DirPath = OutputDir + '%d'%(HtmlCounter)
-        if OutputPicture == 1:
-            if GetJpg.CatchJPG(url,DirPath) != -1:
-                HtmlCounter = HtmlCounter + 1
+        print (url)
+         #如果数据库中不存在该URL，将URL写入数据库，进行攀爬，防止爬虫进入死循环
+        if mysqlop.find(pDataBase,'urllist',url) == -1:
+            mysqlop.insert(pDataBase,'urllist',HtmlTotalCounter,url)
+            urlhtml_fp.write(url)
+            urlhtml_fp.write("\n")
+            DirPath = OutputDir + '%d'%(HtmlValidCounter)
+            #判断是否要进行图片解析
+            if OutputPicture == 1:
+                if GetJpg.CatchJPG(url,DirPath) != -1:
+                    HtmlValidCounter = HtmlValidCounter + 1
+            HtmlTotalCounter = HtmlTotalCounter + 1
         
     m =re.match(r"https://.+?\.html$|https://.+?\.htm$" ,url)
     if m:
-        print (url) 
-        urlhtml_fp.write(url)
-        urlhtml_fp.write("\n")
-        DirPath = OutputDir + '%d'%(HtmlCounter)
-        if OutputPicture == 1:
-            if GetJpg.CatchJPG(url,DirPath) != -1:
-                HtmlCounter = HtmlCounter + 1
-        
+        print (url)
+        if mysqlop.find(pDataBase,'urllist',url) == -1:
+            mysqlop.insert(pDataBase,'urllist',HtmlTotalCounter,url)
+            urlhtml_fp.write(url)
+            urlhtml_fp.write("\n")
+            DirPath = OutputDir + '%d'%(HtmlValidCounter)
+            #判断是否要进行图片解析
+            if OutputPicture == 1:
+                if GetJpg.CatchJPG(url,DirPath) != -1:
+                    HtmlValidCounter = HtmlValidCounter + 1
+            HtmlTotalCounter = HtmlTotalCounter + 1
+
     m =re.match(r"http://.+?\.com/$|http://.+?\.com$" ,url)
     if m:
         if url[len(url)-1] == '/':
             url = url[0:len(url)-1]
-        print (url) 
-        urlhtml_fp.write(url)
-        urlhtml_fp.write("\n")
-        DirPath = OutputDir + '%d'%(HtmlCounter)
-        if OutputPicture == 1:
-            if GetJpg.CatchJPG(url,DirPath) != -1:
-                HtmlCounter = HtmlCounter + 1
-        
-    m =re.match(r"https://.+?\.com/$|https://.+?\.com$" ,url)
-    if m:
-        print (url) 
-        urlhtml_fp.write(url)
-        urlhtml_fp.write("\n")
-        DirPath = OutputDir + '%d'%(HtmlCounter)
-        if OutputPicture == 1:
-            if GetJpg.CatchJPG(url,DirPath) != -1:
-                HtmlCounter = HtmlCounter + 1
+        if mysqlop.find(pDataBase,'urllist',url) == -1:
+            mysqlop.insert(pDataBase,'urllist',HtmlTotalCounter,url)
+            urlcom_fp.write(url)
+            urlcom_fp.write("\n")
+            DirPath = OutputDir + '%d'%(HtmlValidCounter)
+            #判断是否要进行图片解析
+            if OutputPicture == 1:
+                if GetJpg.CatchJPG(url,DirPath) != -1:
+                    HtmlValidCounter = HtmlValidCounter + 1
+            HtmlTotalCounter = HtmlTotalCounter + 1
                 
+    m =re.match(r"https://.+?\.com/$|https://.+?\.com$" ,url)
+    
+    if m:
+        print (url)       
+        if mysqlop.find(pDataBase,'urllist',url) == -1:
+            mysqlop.insert(pDataBase,'urllist',HtmlTotalCounter,url)
+            urlcom_fp.write(url)
+            urlcom_fp.write("\n")
+            DirPath = OutputDir + '%d'%(HtmlValidCounter)
+            #判断是否要进行图片解析
+            if OutputPicture == 1:
+                if GetJpg.CatchJPG(url,DirPath) != -1:
+                    HtmlValidCounter = HtmlValidCounter + 1
+            HtmlTotalCounter = HtmlTotalCounter + 1
         
 '''
     m =re.match(r"http://.+?\.com$" ,url)
@@ -108,4 +149,5 @@ for url in link_list:
 urlall_fp.close()
 urlhtml_fp.close()
 urlcom_fp.close()
+mysqlop.close(pDataBase)
 print('Climb Over')

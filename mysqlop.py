@@ -1,7 +1,7 @@
 #!/usr/bin/python3
  
 import pymysql
-
+import time
 
 
 def open(database_name):
@@ -41,6 +41,7 @@ def createtable(database,tablename):
    '''
    sqlcmd = """CREATE TABLE %s (
    ID INT,
+   TIME CHAR(20) NOT NULL,
    URL CHAR(200) NOT NULL)"""%tablename
    
    #print (sqlcmd)
@@ -58,8 +59,9 @@ def insert(database,tablename,urlid,url):
             LAST_NAME, AGE, SEX, INCOME)
             VALUES ('Mac', 'Mohan', 20, 'M', 2000)"""%tablename
    '''
-   sqlcmd = """INSERT INTO %s(ID,URL)
-            VALUES (%d,'%s')"""%(tablename,urlid,url)
+   curtime = time.strftime('%H:%M:%S',time.localtime(time.time()))
+   sqlcmd = """INSERT INTO %s(ID,TIME,URL)
+            VALUES (%d,'%s','%s')"""%(tablename,urlid,curtime,url)
    
    #print (sqlcmd)
    try:
@@ -91,14 +93,35 @@ def read(database,tablename,urlid):
       results = cursor.fetchall()
       for row in results:
          idid = row[0]
-         urlurl = row[1]
+         time  = row[1]
+         urlurl = row[2]
           # 打印结果
          #print ("idid=%d,urlurl=%s" % (idid, urlurl ))
          return urlurl
    except:
       print ("Error: unable to fetch data")
       return -1
+   return -1
 
+def find(database,tablename,url):
+   cursor = database.cursor()
+   # SQL 查询语句
+   sqlcmd = """SELECT * FROM %s WHERE URL = '%s'""" % (tablename,url)
+   #print(sqlcmd)
+   try:
+      cursor.execute(sqlcmd)
+      results = cursor.fetchall()
+      for row in results:
+         idid = row[0]
+         time  = row[1]
+         urlurl = row[2]
+         #print ("idid=%d,urlurl=%s" % (idid, urlurl ))
+         return idid
+      
+   except:
+      print ("Error: unable to fetch data")
+      return -1
+   return -1
 
 
 def close(database):
