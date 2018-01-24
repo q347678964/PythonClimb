@@ -13,7 +13,7 @@ def tryopen(UrlParameter):
             'url':UrlParameter,
             'error_type':'requests.get.error'
         }
-        print(data)
+        #print(data)
         return -1
     else:
         try:
@@ -23,7 +23,7 @@ def tryopen(UrlParameter):
                 'url':UrlParameter,
                 'error_type':'requests.status.error'
             }
-            print(data)
+            #print(data)
             return -1
         else:
             return r

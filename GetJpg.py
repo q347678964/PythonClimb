@@ -4,7 +4,8 @@ import requests
 import re
 import time
 import urlopen
-  
+import threading
+
 def dowloadPic(imageUrl,filePath):
     r = urlopen.tryopen(imageUrl)
     if r != -1:
@@ -73,7 +74,7 @@ def CatchJPG(UrlParameter,SaveDirPath):
                 continue;
                 
                           
-            print (url)
+            #print (url)
                 
             urljpg_fp.write(url)
             urljpg_fp.write("\n")
@@ -108,7 +109,7 @@ def CatchJPG(UrlParameter,SaveDirPath):
                 continue;
                 
                           
-            print (url)
+            #print (url)
                 
             urljpg_fp.write(url)
             urljpg_fp.write("\n")
@@ -129,3 +130,9 @@ def CatchJPG(UrlParameter,SaveDirPath):
             return 0
     else:
         return -1
+
+
+def CatChJpgThread(UrlParameter,SaveDirPath):
+    t =threading.Thread(target=CatchJPG,args=(UrlParameter,SaveDirPath))
+    t.start()
+    
