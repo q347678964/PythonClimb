@@ -42,7 +42,8 @@ def createtable(database,tablename):
    sqlcmd = """CREATE TABLE %s (
    ID INT,
    TIME CHAR(20) NOT NULL,
-   URL CHAR(200) NOT NULL)"""%tablename
+   URL CHAR(200) NOT NULL,
+   DIRPATH CHAR(200))"""%tablename
    
    #print (sqlcmd)
    cursor.execute(sqlcmd)
@@ -74,8 +75,17 @@ def insert(database,tablename,urlid,url):
       print ('unable to write data')
       database.rollback()
 
-
-
+def update(database,tablename,url,dirpath):
+   cursor = database.cursor()
+   sqlcmd = """UPDATE %s SET DIRPATH ='%s' WHERE URL = '%s'"""%(tablename,dirpath,url)
+   #print (sqlcmd)
+   
+   try:
+      cursor.execute(sqlcmd)
+      database.commit()
+   except:
+      print ('unable to update data')
+      database.rollback()
 
 def read(database,tablename,urlid):
    cursor = database.cursor()

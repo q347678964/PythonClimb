@@ -7,10 +7,14 @@ import mysqlop
 import time
 import urlopen
 import sys
+import ultility
 
 OutputPicture = 1
 OutputDir = '.\output'
-CatChWeb = 'http://www.163.com'
+CatChWeb = 'https://www.ivrfans.cn/meinvtupian/meinvzipai/92228_1.html'
+LastWeb = ultility.GetLastPath(CatChWeb)
+if(LastWeb != -1):
+    print(LastWeb)
 #打开URL
 rep = urlopen.tryopen(CatChWeb)
 if rep == -1:
@@ -80,6 +84,7 @@ for url in link_list:
     urlall_fp.write(url)
     urlall_fp.write("\r\n")
     #找http://*.html|htm
+    ########################################################################
     m =re.match(r"http://.+?\.html$|http://.+?\.htm$" ,url)
     if m:
         print (url)
@@ -93,8 +98,9 @@ for url in link_list:
             if OutputPicture == 1:
                 if GetJpg.CatchJPG(url,DirPath) != -1:
                     HtmlValidCounter = HtmlValidCounter + 1
+                    mysqlop.update(pDataBase,'urllist',url,DirPath)
             HtmlTotalCounter = HtmlTotalCounter + 1
-        
+    ##########################################################################
     m =re.match(r"https://.+?\.html$|https://.+?\.htm$" ,url)
     if m:
         print (url)
@@ -107,8 +113,26 @@ for url in link_list:
             if OutputPicture == 1:
                 if GetJpg.CatchJPG(url,DirPath) != -1:
                     HtmlValidCounter = HtmlValidCounter + 1
+                    mysqlop.update(pDataBase,'urllist',url,DirPath)
             HtmlTotalCounter = HtmlTotalCounter + 1
-
+    #存在html后缀，但是没有http开头#########################################################################
+    m =re.match(r".+?\.htm$|.+?\.html$" ,url)
+    if m:
+        if(url[0:3] != 'http'):
+            url = LastWeb + '/' + url
+        print (url)
+        if mysqlop.find(pDataBase,'urllist',url) == -1:
+            mysqlop.insert(pDataBase,'urllist',HtmlTotalCounter,url)
+            urlhtml_fp.write(url)
+            urlhtml_fp.write("\n")
+            DirPath = OutputDir + '%d'%(HtmlValidCounter)
+            #判断是否要进行图片解析
+            if OutputPicture == 1:
+                if GetJpg.CatchJPG(url,DirPath) != -1:
+                    HtmlValidCounter = HtmlValidCounter + 1
+                    mysqlop.update(pDataBase,'urllist',url,DirPath)
+            HtmlTotalCounter = HtmlTotalCounter + 1 
+    ########################################################################
     m =re.match(r"http://.+?\.com/$|http://.+?\.com$" ,url)
     if m:
         if url[len(url)-1] == '/':
@@ -122,8 +146,9 @@ for url in link_list:
             if OutputPicture == 1:
                 if GetJpg.CatchJPG(url,DirPath) != -1:
                     HtmlValidCounter = HtmlValidCounter + 1
+                    mysqlop.update(pDataBase,'urllist',url,DirPath)
             HtmlTotalCounter = HtmlTotalCounter + 1
-                
+     ########################################################################           
     m =re.match(r"https://.+?\.com/$|https://.+?\.com$" ,url)
     
     if m:
@@ -137,8 +162,9 @@ for url in link_list:
             if OutputPicture == 1:
                 if GetJpg.CatchJPG(url,DirPath) != -1:
                     HtmlValidCounter = HtmlValidCounter + 1
+                    mysqlop.update(pDataBase,'urllist',url,DirPath)
             HtmlTotalCounter = HtmlTotalCounter + 1
-        
+     ########################################################################
 '''
     m =re.match(r"http://.+?\.com$" ,url)
     if m:

@@ -1,9 +1,9 @@
-'''
+
 import requests  
 import re
 import GetJpg
 OutputDir = '.\output'
-url = 'http://www.68gxdy.com'
+url = 'https://www.ivrfans.cn/meinvtupian/meinvzipai/92228_4.html'
 
 DirPath = OutputDir
 
@@ -24,4 +24,8 @@ result = mysqlop.find(pDataBase,'urllist','www.hao123.com')
 print(result)
 result = mysqlop.find(pDataBase,'urllist','www.none.com')
 print(result)
+
+mysqlop.update(pDataBase,'urllist','www.hao123.com','output1')
+
 mysqlop.close(pDataBase)
+'''
