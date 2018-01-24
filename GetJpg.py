@@ -135,4 +135,4 @@ def CatchJPG(UrlParameter,SaveDirPath):
 def CatChJpgThread(UrlParameter,SaveDirPath):
     t =threading.Thread(target=CatchJPG,args=(UrlParameter,SaveDirPath))
     t.start()
-    
+    return 0

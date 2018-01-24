@@ -20,7 +20,7 @@ print (CurtimeString)
 ################打开URL
 OutputPicture = 1
 OutputDir = '.\output'
-CatChWeb = 'https://www.ivrfans.cn'
+CatChWeb = 'https://www.847aa.com/htm/piclist2'
 LastWeb = ultility.GetLastPath(CatChWeb)
 if(LastWeb != -1):
     print('LastWeb = %s'%LastWeb)
