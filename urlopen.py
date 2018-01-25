@@ -7,7 +7,7 @@ header = {
 
 def tryopen(UrlParameter):
     try:
-        r = requests.get(UrlParameter,headers=header,timeout=3)
+        r = requests.get(UrlParameter,headers=header,timeout=4)
     except Exception:
         data = {
             'url':UrlParameter,

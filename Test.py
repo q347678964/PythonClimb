@@ -1,15 +1,15 @@
 #抓图测试#####################################################
-'''
+
 import requests  
 import re
 import GetJpg
-OutputDir = '.\output'
+OutputDir = '.\\output\\'
 url = 'https://www.ivrfans.cn/meinvtupian/meinvzipai/92228_4.html'
 
 DirPath = OutputDir
 
 GetJpg.CatchJPG(url,DirPath)
-'''
+GetJpg.CatchJPG(url,DirPath)
 ################################################################
 
 
@@ -59,7 +59,7 @@ for i in range(4):
     t.start()
 
 print ('main thread end!')
-'''
+
 import threading
 import time
 #方法一：将要执行的方法作为参数传给Thread的构造方法
@@ -72,4 +72,5 @@ for i in range(4):
     t.start()
 
 print ('main thread end!')
+'''
 #####################################################

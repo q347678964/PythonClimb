@@ -5,7 +5,9 @@ import re
 import time
 import urlopen
 import threading
+import mysqlop
 
+    
 def dowloadPic(imageUrl,filePath):
     r = urlopen.tryopen(imageUrl)
     if r != -1:
@@ -50,7 +52,7 @@ def CatchJPG(UrlParameter,SaveDirPath):
         # | 满足其中之一个正直表达式就行
         #下面的正直表达式的意思是提取href="..."之间的内容,或者href'...'之间的内容
         urljpg_fp = open("GetJpg_jpgurl.txt","w",encoding='utf-8')
-
+        #####################################################################################
         link_list = re.findall(r"(?<=src=\").+?\.jpg(?=\")|(?<=: \").+?\.jpg(?=\")" ,html_doc)
 
         jpgcounter = 0

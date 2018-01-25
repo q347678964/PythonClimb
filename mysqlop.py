@@ -2,7 +2,8 @@
  
 import pymysql
 import time
-
+import ultility
+import string
 
 def open(database_name):
    # 打开数据库连接
@@ -48,21 +49,13 @@ def createtable(database,tablename):
    #print (sqlcmd)
    cursor.execute(sqlcmd)
 
-
-
-
-def insert(database,tablename,urlid,url):
+def insert(database,tablename,urlid,url,dirpath):
    #print(database)
    cursor = database.cursor()
    # SQL 插入语句
-   '''
-   sqlcmd = """INSERT INTO %s(FIRST_NAME,
-            LAST_NAME, AGE, SEX, INCOME)
-            VALUES ('Mac', 'Mohan', 20, 'M', 2000)"""%tablename
-   '''
    curtime = time.strftime('%H:%M:%S',time.localtime(time.time()))
-   sqlcmd = """INSERT INTO %s(ID,TIME,URL)
-            VALUES (%d,'%s','%s')"""%(tablename,urlid,curtime,url)
+   sqlcmd = """INSERT INTO %s(ID,TIME,URL,DIRPATH)
+            VALUES (%d,'%s','%s','%s')"""%(tablename,urlid,curtime,url,dirpath)
    
    #print (sqlcmd)
    try:
@@ -74,7 +67,7 @@ def insert(database,tablename,urlid,url):
       # 如果发生错误则回滚
       print ('unable to write data')
       database.rollback()
-
+      
 def update(database,tablename,url,dirpath):
    cursor = database.cursor()
    sqlcmd = """UPDATE %s SET DIRPATH ='%s' WHERE URL = '%s'"""%(tablename,dirpath,url)
@@ -113,6 +106,7 @@ def read(database,tablename,urlid):
       return -1
    return -1
 
+
 def find(database,tablename,url):
    cursor = database.cursor()
    # SQL 查询语句
@@ -133,6 +127,24 @@ def find(database,tablename,url):
       return -1
    return -1
 
+def getitemnum(database,tablename):
+   cursor = database.cursor()
+   sqlcmd = """SELECT COUNT(*) FROM %s"""%tablename
+   #print (sqlcmd)
+   '''
+   try:
+      cursor.execute(sqlcmd)
+      numstr = ( cursor.fetchone())
+      ultility.GetNumFromString(numstr)
+      return ord(numstr)
+   except:
+      return -1
+   '''
+   cursor.execute(sqlcmd)
+   numstr = ( cursor.fetchone())
+   #(199,)取出199
+   num = ultility.GetNumFromString(str(numstr))
+   return int(num)
 
 def close(database):
    # 关闭数据库连接
